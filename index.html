@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Typing Match — Word Pop</title>
+  <style>
+    :root{
+      --bg: #0f1226;
+      --panel: #161a39;
+      --accent: #6ee7ff;
+      --accent-2: #a78bfa;
+      --good: #34d399;
+      --bad: #fb7185;
+      --text: #e8eaf7;
+      --muted: #a2a6c9;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif;
+      background: radial-gradient(1200px 800px at 80% -20%, #1b1f49 0%, transparent 60%),
+                  radial-gradient(1000px 600px at -10% 120%, #1a2c4e 0%, transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      display:flex; align-items:center; justify-content:center; padding:20px;
+    }
+    .app{width: min(1100px, 95vw);}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:12px}
+    .title{font-weight:800; letter-spacing:0.3px; font-size:clamp(20px, 2.8vw, 28px)}
+    .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .btn{
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border:none; color:#0b0d1e; font-weight:700; padding:10px 14px; border-radius:14px; cursor:pointer;
+      box-shadow: 0 6px 18px rgba(115, 171, 255, .25);
+    }
+    .btn.secondary{background:#232857; color:var(--text); box-shadow:none; border:1px solid #2a2f66}
+    select, input[type="text"]{
+      background:#0f1433; color:var(--text); border:1px solid #2a2f66; border-radius:12px; padding:16px 20px;
+      outline:none; font-size:18px;
+    }
+    .hud{display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin:12px 0}
+    .card{
+      background:linear-gradient(180deg, #1a1f47, #15183a); border:1px solid #2a2f66; border-radius:18px; padding:12px 14px; min-height:52px;
+      display:flex; flex-direction:column; justify-content:center
+    }
+    .card small{color:var(--muted); font-weight:600; letter-spacing:.2px}
+    .card strong{font-size:18px; line-height:1.1}
+
+    .board{
+      position:relative; height:62vh; min-height:420px; border-radius:22px; overflow:hidden;
+      background: radial-gradient(1000px 400px at 20% 0%, rgba(90,110,255,.25) 0%, transparent 60%),
+                  linear-gradient(180deg, rgba(255,255,255,.04), transparent 20%),
+                  #0b0f27;
+      border:1px solid #2a2f66;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02), 0 20px 50px rgba(0,0,0,.45);
+    }
+    .ground{position:absolute; inset:auto 0 0 0; height:16px; background:linear-gradient(180deg, transparent, rgba(255,255,255,.06));}
+
+    .word{
+      position:absolute; padding:8px 12px; border-radius:14px; font-weight:800; letter-spacing:.3px; white-space:nowrap;
+      background:rgba(111, 231, 255, .12); border:1px solid rgba(111, 231, 255, .35); backdrop-filter: blur(3px);
+      transform:translate(-50%, -50%); will-change: transform; user-select:none;
+      text-shadow:0 1px 0 rgba(0,0,0,.25);
+    }
+    .word.match{background:rgba(52, 211, 153, .15); border-color:rgba(52,211,153,.55)}
+    .word.missed{background:rgba(251,113,133,.12); border-color:rgba(251,113,133,.45)}
+
+    .typing{
+      display:flex; gap:8px; align-items:center; margin-top:12px;
+      position: relative;
+      z-index: 10;
+    }
+    .typing input{
+      flex:1;
+      min-height: 48px;
+      font-size: 18px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #0f1433;
+      color: var(--text);
+      border: 1px solid #2a2f66;
+      outline: none;
+    }
+    .typing input:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(110, 231, 255, 0.3);
+    }
+    .pill{padding:6px 10px; border-radius:999px; background:#19204d; border:1px solid #2a2f66; color:var(--muted); font-size:12px}
+
+    .overlay{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+    .modal{
+      backdrop-filter: blur(4px); background:rgba(15,18,38,.5); border:1px solid #2a2f66; border-radius:22px; padding:24px; width:min(520px, 92%);
+      text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,.45)
+    }
+    .modal h2{margin:6px 0 10px 0}
+    .modal p{color:var(--muted); margin:0 0 16px 0}
+
+    @media (max-width: 640px){
+      .hud{grid-template-columns: repeat(2, minmax(0,1fr));}
+      .board{height: 58vh;}
+      header{flex-direction:column; align-items:flex-start}
+      .typing{
+        flex-direction: column;
+        gap: 12px;
+      }
+      .typing input{
+        font-size: 16px;
+        padding: 14px 16px;
+        min-height: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">🔤 Typing Word War — <span style="opacity:.8">Match</span></div>
+      <div class="controls">
+        <label class="pill">Difficulty
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="zen">Zen (no lives)</option>
+          </select>
+        </label>
+        <button id="startBtn" class="btn">Start</button>
+        <button id="pauseBtn" class="btn secondary" disabled>Pause</button>
+        <button id="resetBtn" class="btn secondary" disabled>Reset</button>
+      </div>
+    </header>
+
+    <section class="hud">
+      <div class="card"><small>Score</small><strong id="score">0</strong></div>
+      <div class="card"><small>Lives</small><strong id="lives">10</strong></div>
+      <div class="card"><small>Streak</small><strong id="streak">0</strong></div>
+      <div class="card"><small>Words / min</small><strong id="wpm">0</strong></div>
+    </section>
+
+    <div class="board" id="board" aria-label="Game board" role="application">
+      <div class="overlay" id="overlay">
+        <div class="modal">
+          <h2>Type the words to pop them ✨</h2>
+          <p>Press <b>Start</b>, then type in the box below. Matching a word removes it and gives points. Missed words cost a life. Game ends when lives hit 0 (except Zen).</p>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+            <button class="btn" id="bigStart">Start Game</button>
+            <button class="btn secondary" id="howBtn">How to Play</button>
+          </div>
+        </div>
+      </div>
+      <div class="ground"></div>
+    </div>
+
+    <div class="typing">
+      <input id="input" type="text" placeholder="Type here to match a word… (Press / to focus)" autocomplete="off" disabled />
+      <span class="pill" title="Hotkeys: S=start, P=pause, R=reset, /=focus">Hotkeys: S • P • R • /</span>
+    </div>
+  </div>
+
+  <script>
+    // --- Word list (customize freely) ---
+    const WORD_BANK = [
+      'code','html','style','script','array','object','class','const','let','var','loop','while','break','return','async','await','event','click','submit','node','react','server','client','cloud','input','output','value','random','string','number','boolean','null','regex','pixel','frame','timer','score','level','combo','streak','speed','focus','debug','build','deploy','secure','token','crypto','hash','merge','commit','branch','cache','index','fetch','post','get','json','local','store','render','state','effect','hook','chart','graph','image','video','audio','canvas','game','guard','route','auth','model','train','data','query','table','row','cell','grid','flex','gap','align','space','just','center','left','right','top','bottom','toast','modal','card','panel','chip','note','task','goal','time'
+    ];
+
+    const board = document.getElementById('board');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const streakEl = document.getElementById('streak');
+    const wpmEl = document.getElementById('wpm');
+    const inputEl = document.getElementById('input');
+    const overlay = document.getElementById('overlay');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const bigStart = document.getElementById('bigStart');
+    const howBtn = document.getElementById('howBtn');
+    const difficultySel = document.getElementById('difficulty');
+
+    const DIFF = {
+      easy:   { spawn: [1000, 1500], speed: [40, 70], lives: 5, points: 10 },
+      normal: { spawn: [800, 1300],  speed: [60, 95], lives: 3, points: 12 },
+      hard:   { spawn: [650, 1100],  speed: [85, 140], lives: 3, points: 14 },
+      zen:    { spawn: [900, 1200],  speed: [55, 100], lives: Infinity, points: 10 },
+    };
+
+    let words = []; // active words
+    let running = false;
+    let paused = false;
+    let lastTime = 0, rafId = null, spawnTimer = 0, nextSpawnIn = 1200;
+    let score = 0, lives = 10, streak = 0, totalTyped = 0, startedAt = 0;
+
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+    function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+    function resetGame(){
+      cancelAnimationFrame(rafId);
+      words.forEach(w => w.el.remove());
+      words = [];
+      running = false; paused = false;
+      score = 0; streak = 0; totalTyped = 0; startedAt = 0;
+      const cfg = DIFF[difficultySel.value];
+      lives = cfg.lives === 3 ? 5 : cfg.lives;
+      updateHUD();
+      spawnTimer = 0; nextSpawnIn = rand(...cfg.spawn);
+      inputEl.value = '';
+      inputEl.disabled = true;
+      pauseBtn.disabled = true; resetBtn.disabled = false;
+      startBtn.disabled = false;
+      overlay.style.display = 'flex';
+    }
+
+    function startGame(){
+      if(running) return;
+      resetGame();
+      overlay.style.display = 'none';
+      running = true; paused = false; lastTime = performance.now(); startedAt = lastTime;
+      inputEl.disabled = false; inputEl.focus();
+      startBtn.disabled = true; pauseBtn.disabled = false; resetBtn.disabled = false;
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function pauseGame(){
+      if(!running) return;
+      paused = !paused;
+      if(paused){ cancelAnimationFrame(rafId); pauseBtn.textContent = 'Resume'; }
+      else { lastTime = performance.now(); rafId = requestAnimationFrame(tick); pauseBtn.textContent = 'Pause'; }
+    }
+
+    function gameOver(){
+      running = false; cancelAnimationFrame(rafId); inputEl.disabled = true; pauseBtn.disabled = true; startBtn.disabled = false;
+      // Show overlay with results
+      overlay.innerHTML = `
+        <div class="modal">
+          <h2>Game Over 💥</h2>
+          <p>Your score <b>${score}</b> • Longest streak <b>${bestStreak}</b> • WPM <b>${calcWPM()}</b></p>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+            <button class="btn" id="playAgain">Play Again</button>
+            <button class="btn secondary" id="shareBtn">Copy Result</button>
+          </div>
+        </div>`;
+      overlay.style.display = 'flex';
+      document.getElementById('playAgain').addEventListener('click', startGame);
+      document.getElementById('shareBtn').addEventListener('click', () => {
+        const text = `Typing Match — Score: ${score}, WPM: ${calcWPM()}, Streak: ${bestStreak}`;
+        navigator.clipboard?.writeText(text);
+      });
+    }
+
+    let bestStreak = 0;
+    function updateHUD(){
+      scoreEl.textContent = score;
+      livesEl.textContent = lives === Infinity ? '∞' : lives;
+      streakEl.textContent = streak;
+      wpmEl.textContent = calcWPM();
+      bestStreak = Math.max(bestStreak, streak);
+    }
+
+    function calcWPM(){
+      if(!startedAt) return 0;
+      const minutes = Math.max((performance.now() - startedAt)/60000, 0.01);
+      return Math.round((totalTyped/5) / minutes);
+    }
+
+    function spawnWord(){
+      const cfg = DIFF[difficultySel.value];
+      const text = choice(WORD_BANK);
+      const x = rand(8, board.clientWidth - 8);
+      const y = -20; // start above the board
+      const speed = rand(...cfg.speed); // px/sec
+      const el = document.createElement('div');
+      el.className = 'word';
+      el.textContent = text;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.setAttribute('data-text', text);
+      board.appendChild(el);
+      words.push({ text, x, y, speed, el, matched:false });
+    }
+
+    function tick(ts){
+      if(!running || paused){ return; }
+      const dt = (ts - lastTime) / 1000; // seconds
+      lastTime = ts;
+      const cfg = DIFF[difficultySel.value];
+
+      // move words
+      for(let i = words.length - 1; i >= 0; i--){
+        const w = words[i];
+        w.y += w.speed * dt;
+        if(w.y >= board.clientHeight - 14){
+          // missed
+          w.el.classList.add('missed');
+          w.el.remove();
+          words.splice(i,1);
+          if(cfg.lives !== Infinity){
+            lives = Math.max(0, lives - 1);
+            streak = 0;
+            if(lives === 0){ updateHUD(); return gameOver(); }
+          }
+          updateHUD();
+          continue;
+        }
+        w.el.style.transform = `translate(${0}px, ${w.y}px)`;
+      }
+
+      // spawn logic
+      spawnTimer += ts - (ts - dt*1000);
+      nextSpawnIn -= dt*1000;
+      if(nextSpawnIn <= 0){
+        spawnWord();
+        nextSpawnIn = rand(...cfg.spawn);
+        // Slight ramp: increase speed a bit over time
+        cfg.speed = [cfg.speed[0]*1.002, cfg.speed[1]*1.002];
+      }
+
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function tryMatch(){
+      const val = inputEl.value.trim().toLowerCase();
+      if(!val) return;
+      const idx = words.findIndex(w => w.text === val);
+      if(idx !== -1){
+        // hit
+        const hit = words[idx];
+        hit.el.classList.add('match');
+        setTimeout(() => hit.el.remove(), 120);
+        words.splice(idx,1);
+        inputEl.value = '';
+        streak += 1;
+        totalTyped += val.length;
+        const base = DIFF[difficultySel.value].points;
+        const bonus = Math.min(20, Math.floor(streak/5));
+        score += base + bonus; // small combo bonus every 5 streak
+        // tiny juice: pop text
+        flyText(`+${base + bonus}`, hit.el.offsetLeft, hit.y);
+        updateHUD();
+      }
+    }
+
+    function flyText(text, x, y){
+      const fx = document.createElement('div');
+      fx.textContent = text;
+      fx.style.position = 'absolute';
+      fx.style.left = x + 'px'; fx.style.top = y + 'px';
+      fx.style.transform = 'translate(-50%, -50%)';
+      fx.style.pointerEvents = 'none';
+      fx.style.fontWeight = '800'; fx.style.fontSize = '14px';
+      fx.style.color = 'var(--good)'; fx.style.textShadow = '0 1px 0 rgba(0,0,0,.25)';
+      board.appendChild(fx);
+      const start = performance.now();
+      function anim(t){
+        const dt = (t - start)/600; const yoff = -30*dt; fx.style.opacity = String(1 - dt);
+        fx.style.transform = `translate(-50%, calc(-50% + ${yoff}px))`;
+        if(dt < 1) requestAnimationFrame(anim); else fx.remove();
+      }
+      requestAnimationFrame(anim);
+    }
+
+    // --- Events ---
+    inputEl.addEventListener('input', tryMatch);
+
+    startBtn.addEventListener('click', startGame);
+    bigStart.addEventListener('click', startGame);
+    resetBtn.addEventListener('click', resetGame);
+    pauseBtn.addEventListener('click', pauseGame);
+
+    howBtn.addEventListener('click', () => {
+      alert('Type words shown in the game board.\n\n• Start: S key or Start button\n• Pause/Resume: P key\n• Reset: R key\n• Focus input: / key\n\nCombo bonus: every 5 correct in a row adds extra points!');
+    });
+
+    // Hotkeys - prevent interference with input field
+    window.addEventListener('keydown', (e) => {
+      // Don't trigger hotkeys when typing in the input field
+      if (document.activeElement === inputEl) {
+        if (e.key === '/') {
+          e.preventDefault();
+        }
+        return;
+      }
+      
+      if(e.key === '/') { e.preventDefault(); inputEl.focus(); }
+      if(e.key.toLowerCase() === 's'){ startGame(); }
+      if(e.key.toLowerCase() === 'p'){ pauseGame(); }
+      if(e.key.toLowerCase() === 'r'){ resetGame(); }
+    });
+
+    // Resize safety: keep words within bounds
+    new ResizeObserver(() => {
+      words.forEach(w => {
+        w.x = Math.max(8, Math.min(board.clientWidth - 8, w.x));
+        w.el.style.left = w.x + 'px';
+      });
+    }).observe(board);
+
+    // Initialize
+    resetGame();
+  </script>
+</body>
+</html>
