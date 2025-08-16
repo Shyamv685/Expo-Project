@@ -97,17 +97,45 @@
     .modal p{color:var(--muted); margin:0 0 16px 0}
 
     @media (max-width: 640px){
-      .hud{grid-template-columns: repeat(4, minmax(0,1fr));}
-      .board{height: 18vh;}
+      .hud{grid-template-columns: repeat(2 minmax(0,1fr));}
+      .board{height: 8vh;}
       header{flex-direction:column; align-items:flex-start}
       .typing{
         flex-direction: column;
         gap:1px;
+      } .card{
+        width:70px; height:50px; padding:10px 10px; font-size:11px;gap: 10px;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
       }
+      .pill{
+        font-size: 14px; padding: 4px 8px; margin-top: 6px;margin-left:25px;
+        width:270px;
+      
+      }
+      #difficulty{
+        width: 120px;
+        height: 56px;
+       
+       
+      }
+      
+      
+      .overlay{
+       padding: 40px 0px  30px 10px;
+       width: 700px;
+       margin-left:-200px;
+       font-size:12px;
+       height: 250px;}
       .typing input{
         font-size: 16px;
         padding: 14px 16px;
         min-height: 64px;
+      }.board{
+        height: 30vh; min-height: 300px;
+      } .word{
+        padding:6px 10px; font-size:14px; border-radius:12px;
+      } .word.match, .word.missed{
+        font-size:14px; padding:6px 10px;
       }
       .modal{
         width: min(320px, 85%);
