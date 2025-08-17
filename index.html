@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="Logo.png" type="image/png" />
   <title>  Word Storm — Typing Clash</title>
   <style>
 
@@ -20,6 +21,13 @@
       --text: #e8eaf7;
       --muted: #a2a6c9;
     }
+ 
+    .logo{
+      width: 70px;
+      height: 70px;
+      margin-left: 20px;
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -32,7 +40,9 @@
     }
     .app{width: min(1100px, 95vw);}
     header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:12px}
-    .title{font-weight:800; letter-spacing:0.3px; font-size:clamp(20px, 2.8vw, 28px)}
+    .title{font-weight:800; letter-spacing:0.3px; font-size:clamp(20px, 2.8vw, 28px) ;
+      margin-left:-120px;
+    }
     .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
     .btn{
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
@@ -252,10 +262,17 @@
       span .pill{
         width:100px;
         font-size:12px;
+      } .logo{
+        width: 30px;
+        height:30px;
+       position: relative;
+         top:50px;   
       }
       
       .title {
         font-size: 18px;
+        margin-left: 50px;
+        margin-top:10px;
       }
     }
   </style>
@@ -263,7 +280,8 @@
 <body>
   <div class="app"> 
     <header>
-      <div class="title">🔤 Word Storm  <span style="opacity:.8">Typing Clash</span></div>
+      <img  class="logo" src="Logo.png" alt="" >
+      <div class="title">  Word Storm — <span style="opacity:.8">Typing Clash</span></div>
       <div class="controls">
         <label class="pill">Difficulty
           <select id="difficulty">
