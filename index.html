@@ -96,72 +96,154 @@
     .modal h2{margin:6px 0 10px 0}
     .modal p{color:var(--muted); margin:0 0 16px 0}
 
-    @media (max-width: 640px){
-      .hud{grid-template-columns: repeat(2 minmax(0,1fr));}
-      .board{height: 8vh;}
-      header{flex-direction:column; align-items:flex-start}
-      .typing{
-        flex-direction: column;
-        gap:1px;
-      } .card{
-        width:70px; height:30px; padding:5px 5px; font-size:9px;gap:3px; margin:0px;
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-      }
-      .pill{
-        font-size: 18px; padding: 4px 8px; margin-top: 6px;margin-left:20px;
-        width:290px; padding-left:30px;
-      
-      } .controls {
-        margin-top: 0px;     
-       }.modal{
-        width: 90%; max-width: 400px; padding: 20px; font-size:12px;
-
-       #resetBtn, #pauseBtn, #startBtn{ 
-        font-size: 14px; padding: 8px 12px;
-        margin-top: 10px; margin-left: 25px;margin-bottom: 10px;
-      }
-      #difficulty{
-        width: 120px;
-        height: 56px;
-        margin-left:20px;
-        border-radius: 12px;
-        font-size:12px;
-      } #resetBtn, #pauseBtn, #startBtn{
-       margin-left: 20px ;
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
         font-size: 14px;
-        
-      } 
+      }
       
-      span.pill{
-        width: 200px;
+      .app {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 8px;
+      }
+      
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .title {
+        font-size: 20px;
         text-align: center;
-        margin-top: 10px;
-        margin-left:-5px;
+        margin-bottom: 8px;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       
+      .controls {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
       
-      .overlay{
-       width:250px;
-       font-size:12px;
-       height: 250px;}
-      .typing input{
+      .controls .btn,
+      .controls .btn.secondary {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+      }
+      
+      .hud {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin: 8px 0;
+      }
+      
+      .card {
+        padding: 8px;
+        min-height: 48px;
+      }
+      
+      .card small {
+        font-size: 11px;
+      }
+      
+      .card strong {
         font-size: 16px;
-        padding: 14px 16px;
-        min-height: 64px;
-      }.board{
-        height: 30vh; min-height: 300px;
-      } .word{
-        padding:6px 10px; font-size:14px; border-radius:12px;
-      } .word.match, .word.missed{
-        font-size:14px; padding:6px 10px;
       }
-      .modal{
-        width: min(320px, 85%);
-        padding: 1px;
+      
+      .board {
+        height: 50vh;
+        min-height: 280px;
         border-radius: 16px;
       }
-      .modal h2{font-size: 20px;}
-      .modal p{font-size: 14px;}
+      
+      .word {
+        font-size: 14px;
+        padding: 6px 10px;
+        border-radius: 10px;
+      }
+      
+      .typing {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      
+      .typing input {
+        font-size: 16px;
+        padding: 12px;
+        min-height: 44px;
+      }
+      
+      .pill {
+        font-size: 12px;
+        padding: 6px 10px;
+        text-align: center;
+      }
+      
+      .modal {
+        width: 95%;
+        max-width: 300px;
+        padding: 16px;
+        border-radius: 16px;
+        margin: 10px;
+      }
+      
+      .modal h2 {
+        font-size: 18px;
+        margin: 0 0 8px 0;
+      }
+      
+      .modal p {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      
+      #difficulty {
+        width: 100%;
+        font-size: 14px;
+        padding: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hud {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      
+      .card {
+        padding: 6px;
+        min-height: 40px;
+      }
+      
+      .card strong {
+        font-size: 14px;
+      }
+      
+      .board {
+        height: 45vh;
+        min-height: 240px;
+      }
+      
+      .word {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+      
+      .typing input {
+        font-size: 14px;
+        padding: 10px;
+      }
+      
+      .title {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
