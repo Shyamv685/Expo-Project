@@ -18,7 +18,7 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif;
+      margin:0; padding: 0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif;
       background: radial-gradient(1200px 800px at 80% -20%, #1b1f49 0%, transparent 60%),
                   radial-gradient(1000px 600px at -10% 120%, #1a2c4e 0%, transparent 60%),
                   var(--bg);
@@ -91,7 +91,7 @@
     .overlay{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
     .modal{
       backdrop-filter: blur(4px); background:rgba(15,18,38,.5); border:1px solid #2a2f66; border-radius:22px; padding:24px; width:min(520px, 92%);
-      text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,.45)
+      text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,.45) 
     }
     .modal h2{margin:6px 0 10px 0}
     .modal p{color:var(--muted); margin:0 0 16px 0}
@@ -104,20 +104,35 @@
         flex-direction: column;
         gap:1px;
       } .card{
-        width:70px; height:50px; padding:10px 10px; font-size:11px;gap: 10px;
+        width:70px; height:30px; padding:5px 5px; font-size:9px;gap:3px; margin:0px;
         display:flex; flex-direction:column; align-items:center; justify-content:center;
       }
       .pill{
-        font-size: 14px; padding: 4px 8px; margin-top: 6px;margin-left:25px;
-        width:270px;
+        font-size: 18px; padding: 4px 8px; margin-top: 6px;margin-left:20px;
+        width:290px; padding-left:30px;
       
+      } .controls {
+        margin-top: 0px;     
+       }.modal{
+        width: 90%; max-width: 400px; padding: 20px; font-size:12px;
+
+       #resetBtn, #pauseBtn, #startBtn{ 
+        font-size: 14px; padding: 8px 12px;
+        margin-top: 10px; margin-left: 25px;margin-bottom: 10px;
       }
       #difficulty{
         width: 120px;
         height: 56px;
-       
-       
-      } span.pill{
+        margin-left:20px;
+        border-radius: 12px;
+        font-size:12px;
+      } #resetBtn, #pauseBtn, #startBtn{
+       margin-left: 20px ;
+        font-size: 14px;
+        
+      } 
+      
+      span.pill{
         width: 200px;
         text-align: center;
         margin-top: 10px;
@@ -126,9 +141,7 @@
       
       
       .overlay{
-       padding: 40px 0px  30px 10px;
-       width: 700px;
-       margin-left:-200px;
+       width:250px;
        font-size:12px;
        height: 250px;}
       .typing input{
