@@ -53,5 +53,5 @@ Type the falling words before they hit the ground, earn points, and test your ty
 ## 📦 Installation / Setup
 1. Clone the repo:  
    ```bash
-   git clone https://github.com/Shyamv685/word-storm.git
+   git clone https://github.com/Shyamv685/Expo-Project.git
 
